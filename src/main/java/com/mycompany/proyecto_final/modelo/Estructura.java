@@ -1,6 +1,11 @@
 package com.mycompany.proyecto_final.modelo;
 
-interface Estructura {
+import java.util.List;
+import java.util.Map;
+
+public interface Estructura {
     Estructura mostrar();
-    System.out.println("5. Salir");
+    String getId();
+    String getNombre();
+    List<Estructura> obtenerHijos();
 }

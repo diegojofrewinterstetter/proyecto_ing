@@ -6,11 +6,26 @@ import java.util.List;
 
 public class Delegacion implements Estructura{
     
+    private String id;
+    private String nombre;
     private List<Estructura> estructura = new ArrayList<>();
     
     @Override
     public Estructura mostrar() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+     @Override
+    public String getId(){
+        return id;
+    }
     
+    @Override
+    public String getNombre(){
+        return nombre;
+    }
+
+    @Override
+    public List<Estructura> obtenerHijos() {
+        return estructura;
+    }
 }
