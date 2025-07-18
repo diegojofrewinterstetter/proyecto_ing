@@ -23,28 +23,32 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
-              <EmptySpace min="-2" pref="302" max="-2" attributes="0"/>
-              <Component id="Lgenerartoken" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="283" max="32767" attributes="0"/>
-          </Group>
           <Component id="Pbarra" alignment="0" max="32767" attributes="0"/>
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-              <Component id="Lpresentacion" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="158" max="-2" attributes="0"/>
-          </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="LIngresarDNI" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="TFtoken" alignment="0" min="-2" pref="205" max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="LIngresarDNI" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="TFdni" alignment="0" min="-2" pref="205" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="244" max="-2" attributes="0"/>
+                  </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="TBgenerar" min="-2" pref="112" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="289" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" pref="244" max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="0" pref="168" max="32767" attributes="0"/>
+              <Component id="Lpresentacion" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="158" max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="224" max="-2" attributes="0"/>
+              <Component id="Lgenerartoken" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -59,29 +63,29 @@
               <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
               <Component id="LIngresarDNI" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="TFtoken" min="-2" max="-2" attributes="0"/>
+              <Component id="TFdni" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="TBgenerar" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="142" max="32767" attributes="0"/>
+              <EmptySpace pref="119" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JTextField" name="TFtoken">
+    <Component class="javax.swing.JTextField" name="TFdni">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TFtokenActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TFdniActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="LIngresarDNI">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Ingrese su contrase&#xf1;a"/>
+        <Property name="text" type="java.lang.String" value="Ingrese DNI"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="Lgenerartoken">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-          <Font name="Segoe UI" size="18" style="0"/>
+          <Font name="Segoe UI" size="36" style="1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Generar Token"/>
       </Properties>

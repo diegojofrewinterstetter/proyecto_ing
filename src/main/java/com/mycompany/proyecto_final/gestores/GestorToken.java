@@ -1,18 +1,12 @@
 package com.mycompany.proyecto_final.gestores;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import com.mycompany.proyecto_final.modelo.Token;
+import java.util.Random;
 
 public class GestorToken {
-    private static GestorToken instancia;  // 🔥 singleton
+    private static GestorToken instancia;
 
-    private Set<String> tokensCreados = new HashSet<>();
-    private Set<String> tokensUsados = new HashSet<>();
-
-    private GestorToken() {
-        
-    }
+    private GestorToken() {}
 
     public static GestorToken getInstancia() {
         if (instancia == null) {
@@ -21,29 +15,20 @@ public class GestorToken {
         return instancia;
     }
 
-    public String generarToken() {
-        String token = UUID.randomUUID().toString();
-        tokensCreados.add(token);
-        return token;
+    public Token generarToken(String eleccionId, String dni) {
+        String tokenString = "ABC-" + generarTokenCorto(6);
+        System.out.println("TOken: "+tokenString);
+        return new Token(tokenString, eleccionId, dni);
     }
 
-    public boolean validarToken(String token) {
-        return tokensCreados.contains(token) && !tokensUsados.contains(token);
-    }
-
-    public void marcarComoUsado(String token) {
-        if (tokensCreados.contains(token)) {
-            tokensUsados.add(token);
-        } else {
-            System.out.println("Token inválido: no fue generado por el sistema.");
+    private String generarTokenCorto(int longitud) {
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder token = new StringBuilder();
+        Random rnd = new Random();
+        for (int i = 0; i < longitud; i++) {
+            int index = rnd.nextInt(caracteres.length());
+            token.append(caracteres.charAt(index));
         }
-    }
-
-    public boolean fueGenerado(String token) {
-        return tokensCreados.contains(token);
-    }
-
-    public boolean yaFueUsado(String token) {
-        return tokensUsados.contains(token);
+        return token.toString();
     }
 }

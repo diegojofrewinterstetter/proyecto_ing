@@ -1,31 +1,62 @@
 package com.mycompany.proyecto_final.modelo;
 
-import com.mycompany.proyecto_final.modelo.Estructura;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Delegacion implements Estructura{
-    
+public class Delegacion implements Estructura {
+
     private String id;
     private String nombre;
-    private List<Estructura> estructura = new ArrayList<>();
-    
-    @Override
-    public Estructura mostrar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-     @Override
-    public String getId(){
-        return id;
+    private List<Estructura> estudiantes = new ArrayList<>();
+
+    public Delegacion(String id, String nombre) {
+        this.id = id;
+        this.nombre = nombre;
     }
     
+    public Delegacion(String id, String nombre, Estudiante estudiante) {
+        this.id = id;
+        this.nombre = nombre;
+        this.estudiantes.add(estudiante);
+    }
+
     @Override
-    public String getNombre(){
-        return nombre;
+    public void agregar(Estructura e) {
+        if (e instanceof Estudiante estudiante) {
+            estudiantes.add(estudiante);
+        } else {
+            System.out.println("Solo se pueden agregar estudiantes a una delegación.");
+        }
+    }
+
+    @Override
+    public void eliminar(Estructura e) {
+        if (e instanceof Estudiante estudiante) {
+            estudiantes.remove(estudiante);
+        }
     }
 
     @Override
     public List<Estructura> obtenerHijos() {
-        return estructura;
+        return new ArrayList<>(estudiantes);
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getNombre() {
+        return nombre;
+    }
+
+    @Override
+    public Estructura mostrar() {
+        System.out.println("Delegación: " + nombre);
+        for (Estructura e : estudiantes) {
+            e.mostrar();
+        }
+        return this;
     }
 }

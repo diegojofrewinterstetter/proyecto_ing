@@ -14,6 +14,7 @@ public class ResultadoVoto implements Estructura {
         this.candidato = candidato;
         this.votos = votos;
     }
+    public ResultadoVoto(){}
 
     public String getEleccionId() {
         return eleccionId;
@@ -55,5 +56,15 @@ public class ResultadoVoto implements Estructura {
     @Override
     public List<Estructura> obtenerHijos() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    public void agregar(Estructura e) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void eliminar(Estructura e) {
+       throw new UnsupportedOperationException("Not supported yet.");
     }
 }

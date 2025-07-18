@@ -16,21 +16,20 @@ public class RegistradorDeVoto {
     }
 
    
-    public boolean ejecutarVoto(String dni, String token, IVoto voto, VotoService service,  Estructura estructura) {
+    public ResultadoVoto ejecutarVoto(String dni, IVoto voto, VotoService service,  Estructura estructura) {
         if (yaVoto(dni)) {
             System.out.println("El DNI ya votó.");
-            return false;
+            return  new ResultadoVoto();
         }
         if (yaVoto(dni)) {
             System.out.println("El DNI ya votó.");
-            return false;
+            return  new ResultadoVoto();
         }
-        EmitirVotoCommand comando = new EmitirVotoCommand(voto, token, service,estructura);
-        comando.execute();
+        EmitirVotoCommand comando = new EmitirVotoCommand(voto, service,estructura);
+        ResultadoVoto resultado = comando.execute();
 
-        dnisQueVotaron.add(dni);
         System.out.println("Voto registrado correctamente.");
-        return true;
+        return resultado;
     }
 
 }

@@ -1,10 +1,14 @@
 
 package com.mycompany.proyecto_final.vista;
 
+import com.mycompany.proyecto_final.modelo.VotacionContext;
+
 
 public class Cargar_Estudiante extends javax.swing.JFrame {
-
-    public Cargar_Estudiante() {
+    
+    private VotacionContext votacion;
+    public Cargar_Estudiante(VotacionContext votacion) {
+        this.votacion = votacion;
         initComponents();
     }
 
@@ -214,8 +218,9 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void TBsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TBsalirActionPerformed
-        Index index = new Index();
-        index.setVisible(true);
+        Gestionar_Votacion v = new Gestionar_Votacion(votacion);
+        v.setVisible(true);
+        this.dispose();
 
         this.dispose();
     }//GEN-LAST:event_TBsalirActionPerformed
@@ -240,15 +245,7 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_CBtribuActionPerformed
 
-    public static void main(String args[]) {
-        
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Cargar_Estudiante().setVisible(true);
-            }
-        });
-    }
-
+   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Bcargar;
     private javax.swing.JComboBox<String> CBtribu;

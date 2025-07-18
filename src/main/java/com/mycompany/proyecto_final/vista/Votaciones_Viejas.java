@@ -112,8 +112,8 @@ public class Votaciones_Viejas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void TBsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TBsalirActionPerformed
-        Index index = new Index();
-        index.setVisible(true);
+        /*Index index = new Index();
+        index.setVisible(true);*/
 
         this.dispose();
     }//GEN-LAST:event_TBsalirActionPerformed

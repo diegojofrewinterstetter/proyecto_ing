@@ -7,10 +7,27 @@ public class Estudiante implements Estructura{
     
     private String dni;
     private String nombre;
+    private String tribu;
     
+    public Estudiante(){ 
+    }
+
     public Estudiante(String dni, String nombre){ 
         this.dni = dni;
         this.nombre = nombre;
+    }
+    public Estudiante(String dni, String nombre, String tribu){ 
+        this.dni = dni;
+        this.nombre = nombre;
+        this.tribu= tribu;
+    }
+
+    public String getTribu() {
+        return tribu;
+    }
+
+    public void setTribu(String tribu) {
+        this.tribu = tribu;
     }
 
     public String getDni() {
@@ -43,5 +60,15 @@ public class Estudiante implements Estructura{
     public String getId() {
         return getDni();
     }
+    @Override
+    public void agregar(Estructura e) {
+        
+    }
+
+    @Override
+    public void eliminar(Estructura e) {
+        
+    }
+
     
 }

@@ -1,10 +1,16 @@
 package com.mycompany.proyecto_final.vista;
 
+import com.mycompany.proyecto_final.controladores.Sistema;
+import com.mycompany.proyecto_final.modelo.VotacionContext;
+import java.util.List;
+
 public class Login extends javax.swing.JFrame {
 
-    
+    private Sistema sistema = new Sistema();
     public Login() {
         initComponents();
+        
+        setLocationRelativeTo(null); 
     }
 
     
@@ -13,7 +19,6 @@ public class Login extends javax.swing.JFrame {
     private void initComponents() {
 
         Pbarra = new javax.swing.JPanel();
-        TBsalir = new javax.swing.JToggleButton();
         TFdni = new javax.swing.JTextField();
         TFpassword = new javax.swing.JTextField();
         Lpassword = new javax.swing.JLabel();
@@ -25,28 +30,15 @@ public class Login extends javax.swing.JFrame {
 
         Pbarra.setBackground(new java.awt.Color(153, 153, 153));
 
-        TBsalir.setText("Salir");
-        TBsalir.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TBsalirActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout PbarraLayout = new javax.swing.GroupLayout(Pbarra);
         Pbarra.setLayout(PbarraLayout);
         PbarraLayout.setHorizontalGroup(
             PbarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PbarraLayout.createSequentialGroup()
-                .addContainerGap(599, Short.MAX_VALUE)
-                .addComponent(TBsalir, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
+            .addGap(0, 700, Short.MAX_VALUE)
         );
         PbarraLayout.setVerticalGroup(
             PbarraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PbarraLayout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addComponent(TBsalir)
-                .addContainerGap())
+            .addGap(0, 42, Short.MAX_VALUE)
         );
 
         TFdni.addActionListener(new java.awt.event.ActionListener() {
@@ -80,35 +72,34 @@ public class Login extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(Pbarra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(154, 154, 154)
+                .addComponent(Lpresentacion)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(162, 162, 162)
+                    .addGap(253, 253, 253)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(Lpresentacion, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(Ldni)
+                            .addComponent(TFdni)
+                            .addComponent(Lpassword)
+                            .addComponent(TFpassword, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createSequentialGroup()
-                            .addGap(91, 91, 91)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(Ldni)
-                                    .addComponent(TFdni)
-                                    .addComponent(Lpassword)
-                                    .addComponent(TFpassword, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGap(43, 43, 43)
-                                    .addComponent(TBingresar, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addContainerGap(162, Short.MAX_VALUE)))
+                            .addGap(43, 43, 43)
+                            .addComponent(TBingresar, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addContainerGap(242, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(Pbarra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(409, Short.MAX_VALUE))
+                .addGap(62, 62, 62)
+                .addComponent(Lpresentacion)
+                .addContainerGap(323, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(104, 104, 104)
-                    .addComponent(Lpresentacion)
-                    .addGap(45, 45, 45)
+                    .addGap(181, 181, 181)
                     .addComponent(Ldni)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(TFdni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -124,13 +115,6 @@ public class Login extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void TBsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TBsalirActionPerformed
-        Index index = new Index();
-        index.setVisible(true);
-
-        this.dispose();
-    }//GEN-LAST:event_TBsalirActionPerformed
-
     private void TFdniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TFdniActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TFdniActionPerformed
@@ -140,49 +124,27 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_TFpasswordActionPerformed
 
     private void TBingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TBingresarActionPerformed
-        int rol;
-        if(rol == 1){
-            Administracion administracion = new Administracion();
-            administracion.setVisible(true);
-
-            this.dispose();
-        }
-        else{
-            Generar_Token generar_token = new Generar_Token();
-            generar_token.setVisible(true);
+        String dni = TFdni.getText();
+        String pass = TFpassword.getText();
+        
+        
+        
+        if (sistema.login(dni, pass)) {
+            List<VotacionContext> elecciones = sistema.listarElecciones();
+            elecciones.forEach(e -> System.out.println(e.getId() + " - " + e.getTipo()));
+            this.dispose(); 
+            Administracion adminView = new Administracion(elecciones);
+            adminView.setVisible(true);
+            adminView.setLocationRelativeTo(null); 
             
-            this.dispose();
+        } else {
+            System.out.println("Usuario o contraseña incorrectos.");
         }
+
     }//GEN-LAST:event_TBingresarActionPerformed
 
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
+       
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Login().setVisible(true);
@@ -196,7 +158,6 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel Lpresentacion;
     private javax.swing.JPanel Pbarra;
     private javax.swing.JToggleButton TBingresar;
-    private javax.swing.JToggleButton TBsalir;
     private javax.swing.JTextField TFdni;
     private javax.swing.JTextField TFpassword;
     // End of variables declaration//GEN-END:variables

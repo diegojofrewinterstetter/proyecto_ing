@@ -30,7 +30,16 @@ public class Lista implements Estructura{
     public String getNombre(){
         return nombre;
     }
+    
+    @Override
+    public void agregar(Estructura e) {
+        estructura.add(e);
+    }
 
+    @Override
+    public void eliminar(Estructura e) {
+        estructura.remove(e);
+    }
     @Override
     public List<Estructura> obtenerHijos() {
         return estructura;

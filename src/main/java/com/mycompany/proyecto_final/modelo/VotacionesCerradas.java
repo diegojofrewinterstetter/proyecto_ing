@@ -3,6 +3,7 @@ import com.mycompany.proyecto_final.gestores.GestorLista;
 import com.mycompany.proyecto_final.gestores.GestorVoto;
 import com.mycompany.proyecto_final.modelo.Estructura;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,26 +12,29 @@ import java.util.Map;
 
 public class VotacionesCerradas implements EstadoVotaciones{
 
-    public VotacionesCerradas instance;
+    public static VotacionesCerradas instance;
     private GestorLista gestor;
     
     
     private VotacionesCerradas(){
     }
     
-    private VotacionesCerradas getInstance(){
+    public static VotacionesCerradas getInstance(){
         if(instance == null){
             instance = new VotacionesCerradas();
         }
         return instance;
     }
-    
+     @Override
+    public String getNombreVisible() {
+        return "Finalizada";
+    }
     @Override
-    public List<Estructura> contarVotos(String eleccionId) {
+    public List<Estructura> contarVotos(String eleccionId, List<ResultadoVoto> votos) {
         List<Estructura> resultados = new ArrayList<>();
 
         
-        List<ResultadoVoto> votos = GestorVoto.getInstance().obtenerVotosPorEleccion(eleccionId);// obtenemos los votos del gestor
+        //List<ResultadoVoto> votos = GestorVoto.getInstance().obtenerVotosPorEleccion(eleccionId);// obtenemos los votos del gestor
 
 
         Map<Estructura, Integer> conteo = new HashMap<>();//agrupar los votos por candidato/lista
@@ -62,22 +66,90 @@ public class VotacionesCerradas implements EstadoVotaciones{
     }
     
     @Override
-    public boolean cargarLista(List<Estructura> lista){
+    public boolean cargarLista(Estructura lista){
+        return false;
+    }
+    
+    @Override
+    public ResultadoVoto procesarVoto(String eleccionId, Estructura listaSeleccionada, String dni){
+        return new ResultadoVoto();
+    }
+    
+    @Override
+    public boolean validarToken(Token token, List<Token> tokens) {
         return false;
     }
     @Override
-    public boolean abrirVotaciones(){ // desarrollar lógica
-        return true;
+    public Token generarToken(String eleccionId, String dni) {
+        return new Token();
     }
-    
-    @Override
-    public boolean cerrarVotaciones(){// desarrollar lógica
-        return true;
-    }
-    
-    
     
     // CheckearPorListaCompleta();
     // AnunciarGanadores();
+
+   @Override
+    public EstadoVotaciones CambiarEstado(EstadoVotaciones estado, Date inicio, Date fin, Date ahora) {
+        System.out.println("Error: Una votacion finalizada no puede cambiar de estado");
+        return this; 
+        
+    }
+    
+     @Override
+    public  Estudiante validarEstudiante(String dni, List<Estudiante> estudiantes){
+        return new Estudiante();
+    }
+    
+    
+    
+    @Override
+    public Estudiante validarEstudianteAvanzado(Estudiante estudiante, List<Estructura> estudiantes) {
+        for (Estructura estructura : estudiantes) {
+            // Nos aseguramos de que sea una tribu
+            if (estructura instanceof Tribu tribu) {
+                for (Estructura hijo : tribu.obtenerHijos()) {
+                    if (hijo instanceof Estudiante est) {
+                        if (est.getDni().equals(estudiante.getDni())) {
+                            return est; // Estudiante encontrado
+                        }
+                    }
+                }
+            }
+        }
+        return null; // No se encontró
+    }
+    
+    @Override
+public boolean agregarEstudiante(Estudiante estudiante, List<Estructura> estudiantes) {
+
+    return false;
+}
+
+    @Override
+    public boolean eliminarEstudiante(String dni, List<Estudiante> estudiantes) {
+        return false;
+    }
+
+    
+    @Override
+    public Estudiante buscarEstudiante(String dni, List<Estructura> tribus) {
+        for (Estructura estructura : tribus) {
+            if (estructura instanceof Tribu tribu) {
+                for (Estructura hijo : tribu.obtenerHijos()) {
+                    if (hijo instanceof Estudiante estudiante) {
+                        if (estudiante.getDni().equals(dni)) {
+                            return estudiante;
+                        }
+                    }
+                }
+            }
+        }
+        return null; // No se encontró el estudiante
+    }
+    @Override
+    public void listarEstudiantes(List<Estudiante> estudiantes) {
+        
+    }
+
+
 }
 

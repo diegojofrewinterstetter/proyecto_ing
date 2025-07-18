@@ -3,66 +3,56 @@ package com.mycompany.proyecto_final.gestores;
 import com.mycompany.proyecto_final.modelo.Estructura;
 import com.mycompany.proyecto_final.modelo.Lista;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GestorLista {
 
-    private static GestorLista instance;
-    private Map<String, Lista> listasGuardadas = new HashMap<>();
-
-    private GestorLista() {
-    }
-
-    public static GestorLista getInstance() {
-        if (instance == null) {
-            instance = new GestorLista();
+    public static boolean agregarLista(Lista lista, List<Estructura> listas) {
+        for (Estructura e : listas) {
+            if (e instanceof Lista && e.getId().equals(lista.getId())) {
+                System.out.println("La lista ya existe: " + lista.getId());
+                return false;
+            }
         }
-        return instance;
-    }
-
-    
-    public boolean agregarLista(Lista lista) { // Agrega una lista 
-        if (listasGuardadas.containsKey(lista.getId())) {
-            System.out.println("La lista ya existe: " + lista.getId());
-            return false;
-        }
-        listasGuardadas.put(lista.getId(), lista);
+        listas.add(lista);
         System.out.println("Lista agregada: " + lista.getNombre());
         return true;
     }
 
-    
-    public boolean guardarLista(List<Estructura> lista) { // Agrega una colección de listas
+    public static boolean guardarListas(List<Estructura> nuevas, List<Estructura> listas) {
         try {
-            for (Estructura e : lista) {
-                if (e instanceof Lista) {
-                    listasGuardadas.put(e.getId(), (Lista) e);
+            for (Estructura e : nuevas) {
+                if (e instanceof Lista && !existeLista(e.getId(), listas)) {
+                    listas.add(e);
                 }
             }
-            System.out.println("Listas guardadas en memoria correctamente.");
+            System.out.println("Listas guardadas correctamente.");
             return true;
         } catch (Exception ex) {
-            System.out.println("Error al guardar lista: " + ex.getMessage());
+            System.out.println("Error al guardar listas: " + ex.getMessage());
             return false;
         }
     }
 
-    
-    public List<Estructura> cargarLista() { // Devuelve todas las listas almacenadas
-        return new ArrayList<>(listasGuardadas.values());
+    public static Lista obtenerLista(String id, List<Estructura> listas) {
+        for (Estructura e : listas) {
+            if (e instanceof Lista && e.getId().equals(id)) {
+                return (Lista) e;
+            }
+        }
+        return null;
     }
 
-    
-    public Lista obtenerLista(String id) { // Obtener una lista específica por ID
-        return listasGuardadas.get(id);
-    }
-
-    
-    public boolean eliminarLista(String id) {
-        if (listasGuardadas.remove(id) != null) {
+    public static boolean eliminarLista(String id, List<Estructura> listas) {
+        Estructura toRemove = null;
+        for (Estructura e : listas) {
+            if (e instanceof Lista && e.getId().equals(id)) {
+                toRemove = e;
+                break;
+            }
+        }
+        if (toRemove != null) {
+            listas.remove(toRemove);
             System.out.println("Lista eliminada: " + id);
             return true;
         }
@@ -70,8 +60,12 @@ public class GestorLista {
         return false;
     }
 
-    
-    public boolean existeLista(String id) {
-        return listasGuardadas.containsKey(id);
+    public static boolean existeLista(String id, List<Estructura> listas) {
+        for (Estructura e : listas) {
+            if (e instanceof Lista && e.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
