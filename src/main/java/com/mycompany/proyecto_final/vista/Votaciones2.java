@@ -21,6 +21,7 @@ public class Votaciones2 extends JFrame {
     private String token;
     private String dni;
     private Token tokenObjeto;
+    private JButton btnVotar; // 👉 Declaración del botón como variable de instancia
 
     public Votaciones2(VotacionContext votacion, String tribuVotante, String dnistr, String tokenstr, String eleccionIdstr) {
         this.votacion = votacion;
@@ -29,7 +30,7 @@ public class Votaciones2 extends JFrame {
         this.token = tokenstr;
         this.dni = dnistr;
         this.eleccionId = eleccionIdstr;
-        this.tokenObjeto = new Token(tokenstr, votacion.getId() ,dnistr );
+        this.tokenObjeto = new Token(tokenstr, votacion.getId(), dnistr);
         this.cargos = new ArrayList<>();
 
         if (listas == null || listas.isEmpty()) {
@@ -153,7 +154,7 @@ public class Votaciones2 extends JFrame {
             }
         });
 
-        JButton btnVotar = new JButton("VOTAR");
+        btnVotar = new JButton("VOTAR"); // 👉 Usamos la variable de instancia
         btnVotar.setBackground(new Color(34, 139, 34));
         btnVotar.setForeground(Color.WHITE);
         btnVotar.setFont(new Font("Arial", Font.BOLD, 14));
@@ -171,6 +172,9 @@ public class Votaciones2 extends JFrame {
     }
 
     private void realizarVotacion() {
+        // 🔒 Desactiva el botón apenas se hace clic
+        btnVotar.setEnabled(false);
+
         if (votacion.getVotaron().contains(dni)) {
             JOptionPane.showMessageDialog(this, "Este usuario ya votó.");
             return;
@@ -179,21 +183,22 @@ public class Votaciones2 extends JFrame {
         if (votos == null || votos.isEmpty()) {
             // Voto en blanco
             String mensaje = votacion.procesarVoto(null, dni, tokenObjeto);
-            JOptionPane.showMessageDialog(this, "Voto en blanco registrado correctamente.");
+            JOptionPane.showMessageDialog(this, mensaje);
             votacion.getVotaron().add(dni);
             dispose();
             return;
         }
 
-        // Procesamos voto por cada cargo seleccionado
         for (Map.Entry<String, Estructura> entry : votos.entrySet()) {
             Estructura lista = entry.getValue();
-            String mensaje = votacion.procesarVoto(lista, dni, tokenObjeto);
-            // podrías loguear cada resultado aquí
+            votacion.procesarVoto(lista, dni, tokenObjeto);
         }
 
         JOptionPane.showMessageDialog(this, "Voto registrado correctamente.");
         votacion.getVotaron().add(dni);
+        
+        Index index= new Index(votacion);
+        index.setVisible(true);
         dispose();
-}
+    }
 }
