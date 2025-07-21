@@ -1,11 +1,6 @@
 package com.mycompany.proyecto_final.vista;
 
-import com.mycompany.proyecto_final.modelo.Delegacion;
-import com.mycompany.proyecto_final.modelo.Estructura;
-import com.mycompany.proyecto_final.modelo.Estudiante;
-import com.mycompany.proyecto_final.modelo.Lista;
-import com.mycompany.proyecto_final.modelo.Tribu;
-import com.mycompany.proyecto_final.modelo.VotacionContext;
+import com.mycompany.proyecto_final.modelo.*;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -13,7 +8,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-import java.util.UUID;
 
 public class Votaciones2 extends JFrame {
 
@@ -26,15 +20,23 @@ public class Votaciones2 extends JFrame {
     private String eleccionId;
     private String token;
     private String dni;
+    private Token tokenObjeto;
 
-    public Votaciones2(List<Estructura> listas, String tribuVotante/*, VotacionContext votacion, String eleccionId, String token, String dni*/) {
-        this.listas = listas;
+    public Votaciones2(VotacionContext votacion, String tribuVotante, String dnistr, String tokenstr, String eleccionIdstr) {
+        this.votacion = votacion;
+        this.listas = votacion.getListasValidas();
         this.tribuVotante = tribuVotante;
+        this.token = tokenstr;
+        this.dni = dnistr;
+        this.eleccionId = eleccionIdstr;
+        this.tokenObjeto = new Token(tokenstr, votacion.getId() ,dnistr );
         this.cargos = new ArrayList<>();
-        /*this.votacion = votacion;
-        this.eleccionId = eleccionId;
-        this.token = token;
-        this.dni = dni;*/
+
+        if (listas == null || listas.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay listas disponibles para votar.", "Sin listas", JOptionPane.WARNING_MESSAGE);
+            dispose();
+            return;
+        }
 
         setTitle("Sistema de Votación para la tribu: " + tribuVotante);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,7 +60,7 @@ public class Votaciones2 extends JFrame {
         Set<String> cargosUnicos = new LinkedHashSet<>();
         for (Estructura lista : listas) {
             for (Estructura tribu : lista.obtenerHijos()) {
-                if (tribu instanceof Delegacion && tribu.getNombre().equals(tribuVotante)) {
+                if (tribu instanceof Tribu && tribu.getNombre().equals(tribuVotante)) {
                     for (Estructura deleg : tribu.obtenerHijos()) {
                         cargosUnicos.add(deleg.getNombre());
                     }
@@ -73,7 +75,7 @@ public class Votaciones2 extends JFrame {
             for (int i = 0; i < listas.size(); i++) {
                 StringBuilder candidatos = new StringBuilder();
                 for (Estructura tribu : listas.get(i).obtenerHijos()) {
-                    if (tribu instanceof Delegacion && tribu.getNombre().equals(tribuVotante)) {
+                    if (tribu instanceof Tribu && tribu.getNombre().equals(tribuVotante)) {
                         for (Estructura deleg : tribu.obtenerHijos()) {
                             if (deleg.getNombre().equals(cargo)) {
                                 for (Estructura est : deleg.obtenerHijos()) {
@@ -106,15 +108,22 @@ public class Votaciones2 extends JFrame {
                 } else {
                     String cargo = (String) table.getValueAt(row, 0);
                     Estructura seleccionada = votos.get(cargo);
-                    String nombreColumna = table.getColumnName(column).replace("Lista ", "");
-                    if (column > 0 && seleccionada != null && seleccionada.getNombre().equals(nombreColumna)) {
-                        c.setBackground(new Color(135, 206, 250));
-                        c.setFont(c.getFont().deriveFont(Font.BOLD));
+
+                    if (column > 0) {
+                        String nombreColumna = listas.get(column - 1).getNombre();
+                        if (seleccionada != null && seleccionada.getNombre().equals(nombreColumna)) {
+                            c.setBackground(new Color(135, 206, 250)); // celeste
+                            c.setFont(c.getFont().deriveFont(Font.BOLD));
+                        } else {
+                            c.setBackground(Color.WHITE);
+                            c.setFont(c.getFont().deriveFont(Font.PLAIN));
+                        }
                     } else {
                         c.setBackground(Color.WHITE);
                         c.setFont(c.getFont().deriveFont(Font.PLAIN));
                     }
                 }
+
                 return c;
             }
         });
@@ -162,79 +171,29 @@ public class Votaciones2 extends JFrame {
     }
 
     private void realizarVotacion() {
-        Lista votoFinal = new Lista("VotoUsuario", "Resumen");
-        for (String cargo : cargos) {
-            Estructura listaElegida = votos.get(cargo);
-            if (listaElegida != null) {
-                Delegacion votoDelegacion = new Delegacion(UUID.randomUUID().toString(), cargo);
-                votoDelegacion.agregar(new Estudiante(listaElegida.getNombre(), "")); // Acá podés cambiar si querés algo más preciso
-                votoFinal.agregar(votoDelegacion);
-            }
+        if (votacion.getVotaron().contains(dni)) {
+            JOptionPane.showMessageDialog(this, "Este usuario ya votó.");
+            return;
         }
 
-        // Procesar el voto con tu lógica
-        String resultado = votacion.procesarVoto(votoFinal, dni, new com.mycompany.proyecto_final.modelo.Token(token, dni, eleccionId));
-
-        if (resultado.startsWith("Voto Realizado")) {
-            JOptionPane.showMessageDialog(this, "¡Voto registrado con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo registrar el voto: " + resultado, "Error", JOptionPane.ERROR_MESSAGE);
+        if (votos == null || votos.isEmpty()) {
+            // Voto en blanco
+            String mensaje = votacion.procesarVoto(null, dni, tokenObjeto);
+            JOptionPane.showMessageDialog(this, "Voto en blanco registrado correctamente.");
+            votacion.getVotaron().add(dni);
+            dispose();
+            return;
         }
-    }
-    public static void main(String[] args) {
-         List<Estructura> listas = new ArrayList<>();
 
-        // Lista 1
-        Lista lista1 = new Lista("L1", "Azul");
+        // Procesamos voto por cada cargo seleccionado
+        for (Map.Entry<String, Estructura> entry : votos.entrySet()) {
+            Estructura lista = entry.getValue();
+            String mensaje = votacion.procesarVoto(lista, dni, tokenObjeto);
+            // podrías loguear cada resultado aquí
+        }
 
-        // Tribu Huarpe en lista1
-        Tribu tribuHuarpe1 = new Tribu("001", "Huarpe");
-
-        // Delegación Cacique con un único estudiante
-        Delegacion caciqueHuarpe1 = new Delegacion("003", "Cacique");
-        caciqueHuarpe1.agregar(new Estudiante("111", "Juan"));
-
-        // Delegación Hechicero con un único estudiante
-        Delegacion hechiceroHuarpe1 = new Delegacion("004", "Hechicero");
-        hechiceroHuarpe1.agregar(new Estudiante("112", "Ana"));
-
-        // Agregamos delegaciones a la tribu
-        tribuHuarpe1.agregar(caciqueHuarpe1);
-        tribuHuarpe1.agregar(hechiceroHuarpe1);
-
-        // Agregamos tribu a la lista
-        lista1.agregar(tribuHuarpe1);
-
-        // Lista 2
-        Lista lista2 = new Lista("L2", "Roja");
-
-        // Tribu Huarpe en lista2
-        Tribu tribuHuarpe2 = new Tribu("002", "Huarpe");
-
-        // Delegación Cacique con un único estudiante
-        Delegacion caciqueHuarpe2 = new Delegacion("005", "Cacique");
-        caciqueHuarpe2.agregar(new Estudiante("113", "Luis"));
-
-        // Delegación Hechicero con un único estudiante
-        Delegacion hechiceroHuarpe2 = new Delegacion("006", "Hechicero");
-        hechiceroHuarpe2.agregar(new Estudiante("114", "Sofía"));
-
-        // Agregamos delegaciones a la tribu
-        tribuHuarpe2.agregar(caciqueHuarpe2);
-        tribuHuarpe2.agregar(hechiceroHuarpe2);
-
-        // Agregamos tribu a la lista
-        lista2.agregar(tribuHuarpe2);
-
-        // Finalmente, agregamos las listas al contenedor
-        listas.add(lista1);
-        listas.add(lista2);
-
-        String tribuDelVotante = "Huarpe";
-        SwingUtilities.invokeLater(() -> new Votaciones2(listas, tribuDelVotante).setVisible(true));
-    }
+        JOptionPane.showMessageDialog(this, "Voto registrado correctamente.");
+        votacion.getVotaron().add(dni);
+        dispose();
 }
-
-    
-
+}

@@ -2,21 +2,24 @@ package com.mycompany.proyecto_final.comando;
 
 import com.mycompany.proyecto_final.modelo.IVoto;
 import com.mycompany.proyecto_final.modelo.ResultadoVoto;
-import com.mycompany.proyecto_final.gestores.GestorVoto;
-import com.mycompany.proyecto_final.gestores.GestorToken;
 import com.mycompany.proyecto_final.modelo.Estructura;
-import com.mycompany.proyecto_final.modelo.Token;
 
 public class VotoService {
+    private static VotoService instancia;
 
-    public ResultadoVoto registrarVoto(IVoto voto,  Estructura estructura) { 
-        
-        
-        ResultadoVoto resultado = voto.votar(estructura, estructura.getId());  
-        /*gestorVoto.registrarVoto(token.getToken(),resultado);
-        gestorToken.marcarComoUsado(token.getToken());*/
-        
-        System.out.println("Voto registrado con éxito.");
+    private VotoService() {}
+
+    public static VotoService getInstance() {
+        if (instancia == null) {
+            instancia = new VotoService();
+        }
+        return instancia;
+    }
+
+    public ResultadoVoto registrarVoto(IVoto voto, String dni, Estructura estructura) {
+         System.out.println("registrarVoto: DNI=" + dni + ", estructura=" + estructura.getNombre());
+        ResultadoVoto resultado = voto.votar(estructura, dni);
+        System.out.println("Resultado del voto: candidato=" + (resultado.getCandidato() != null ? resultado.getCandidato().getNombre() : "null"));
         return resultado;
     }
 }

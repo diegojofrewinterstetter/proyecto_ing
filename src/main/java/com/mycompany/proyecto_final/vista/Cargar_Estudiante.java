@@ -1,7 +1,11 @@
 
 package com.mycompany.proyecto_final.vista;
 
+import com.mycompany.proyecto_final.modelo.Estructura;
+import com.mycompany.proyecto_final.modelo.Estudiante;
 import com.mycompany.proyecto_final.modelo.VotacionContext;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 
 public class Cargar_Estudiante extends javax.swing.JFrame {
@@ -10,6 +14,8 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
     public Cargar_Estudiante(VotacionContext votacion) {
         this.votacion = votacion;
         initComponents();
+        setLocationRelativeTo(null);
+        actualizarTablaEstudiantes();
     }
 
     @SuppressWarnings("unchecked")
@@ -21,14 +27,14 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
         Pcargarestudiante = new javax.swing.JPanel();
         Bcargar = new javax.swing.JButton();
         Ldni = new javax.swing.JLabel();
-        TFdni = new javax.swing.JTextField();
         Lnombre = new javax.swing.JLabel();
         TFnombre = new javax.swing.JTextField();
         Lapellido = new javax.swing.JLabel();
         TFapellido = new javax.swing.JTextField();
         Ltribu = new javax.swing.JLabel();
         Ldni4 = new javax.swing.JLabel();
-        CBtribu = new javax.swing.JComboBox<>();
+        Tribu = new javax.swing.JComboBox<>();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
         Pestudiantes = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         Ttablaestudiantes = new javax.swing.JTable();
@@ -72,12 +78,6 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
 
         Ldni.setText("Ingrese el DNI");
 
-        TFdni.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TFdniActionPerformed(evt);
-            }
-        });
-
         Lnombre.setText("Ingrese el nombre");
 
         TFnombre.addActionListener(new java.awt.event.ActionListener() {
@@ -99,39 +99,41 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
         Ldni4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Ldni4.setText("Ingrese un nuevo estudiante");
 
-        CBtribu.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Huarpe", "Pehuenche" }));
-        CBtribu.addActionListener(new java.awt.event.ActionListener() {
+        Tribu.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Huarpe", "Pehuenche" }));
+        Tribu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CBtribuActionPerformed(evt);
+                TribuActionPerformed(evt);
             }
         });
+
+        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
 
         javax.swing.GroupLayout PcargarestudianteLayout = new javax.swing.GroupLayout(Pcargarestudiante);
         Pcargarestudiante.setLayout(PcargarestudianteLayout);
         PcargarestudianteLayout.setHorizontalGroup(
             PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PcargarestudianteLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
                 .addGroup(PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PcargarestudianteLayout.createSequentialGroup()
-                        .addGap(62, 62, 62)
-                        .addComponent(Bcargar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(CBtribu, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(78, 78, 78)
+                        .addComponent(Bcargar))
+                    .addGroup(PcargarestudianteLayout.createSequentialGroup()
+                        .addGap(16, 16, 16)
                         .addGroup(PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(Ldni)
-                                .addComponent(TFdni, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(Lnombre)
-                                .addComponent(TFnombre, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(Lapellido)
-                                .addComponent(TFapellido, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(Ltribu))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PcargarestudianteLayout.createSequentialGroup()
-                                .addComponent(Ldni4)
-                                .addGap(21, 21, 21)))))
-                .addContainerGap(17, Short.MAX_VALUE))
+                            .addComponent(Tribu, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(Ldni)
+                                    .addComponent(Lnombre)
+                                    .addComponent(TFnombre, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                                    .addComponent(Lapellido)
+                                    .addComponent(TFapellido, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                                    .addComponent(Ltribu)
+                                    .addComponent(jFormattedTextField1))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PcargarestudianteLayout.createSequentialGroup()
+                                    .addComponent(Ldni4)
+                                    .addGap(21, 21, 21))))))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
         PcargarestudianteLayout.setVerticalGroup(
             PcargarestudianteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -140,9 +142,9 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
                 .addComponent(Ldni4)
                 .addGap(18, 18, 18)
                 .addComponent(Ldni)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(TFdni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(12, 12, 12)
+                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(Lnombre)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TFnombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -153,7 +155,7 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(Ltribu)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(CBtribu, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Tribu, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(Bcargar)
                 .addGap(15, 15, 15))
@@ -163,13 +165,13 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
 
         Ttablaestudiantes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "DNI", "Nombre", "Apellido", "Tribu"
+                "DNI", "Nombre", "Tribu"
             }
         ));
         jScrollPane1.setViewportView(Ttablaestudiantes);
@@ -224,31 +226,91 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
 
         this.dispose();
     }//GEN-LAST:event_TBsalirActionPerformed
+    private void actualizarTablaEstudiantes() {
+        List<Estructura> lista = votacion.listarEstudiantes();
 
-    private void BcargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BcargarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BcargarActionPerformed
+        String[] columnas = {"DNI", "Nombre", "Tribu"};
+        Object[][] datos = new Object[lista.size()][3];
 
-    private void TFdniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TFdniActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TFdniActionPerformed
+        for (int i = 0; i < lista.size(); i++) {
+            Estudiante est = (Estudiante) lista.get(i);
+            datos[i][0] = est.getDni();
+            datos[i][1] = est.getNombre();
+            datos[i][2] = est.getTribu();
+        }
 
-    private void TFnombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TFnombreActionPerformed
+        Ttablaestudiantes.setModel(new javax.swing.table.DefaultTableModel(
+            datos,
+            columnas
+        ));
+    }
+    private void TribuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TribuActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_TFnombreActionPerformed
+    }//GEN-LAST:event_TribuActionPerformed
 
     private void TFapellidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TFapellidoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TFapellidoActionPerformed
 
-    private void CBtribuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CBtribuActionPerformed
+    private void TFnombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TFnombreActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_CBtribuActionPerformed
+    }//GEN-LAST:event_TFnombreActionPerformed
+
+    private void BcargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BcargarActionPerformed
+        String name = TFnombre.getText().trim();
+        String apellido = TFapellido.getText().trim();
+        String dni = jFormattedTextField1.getText().trim();
+        String tribu = (String) Tribu.getSelectedItem();
+        System.out.println(tribu);
+        // Validar campos obligatorios
+        if (name.isEmpty() || apellido.isEmpty() || dni.isEmpty() || tribu == null || tribu.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Todos los campos deben estar completos.",
+                "Campos incompletos",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return; // Detener el flujo si hay error
+        }
+
+        // Podés también validar el formato del DNI si querés (opcional):
+        if (!dni.matches("\\d{7,8}")) {
+            JOptionPane.showMessageDialog(
+                this,
+                "El DNI debe tener 7 u 8 dígitos numéricos.",
+                "DNI inválido",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        // Si todo está bien, crear el estudiante
+        String nombreCompleto = name + " " + apellido;
+        Estudiante e = new Estudiante(dni, nombreCompleto, tribu);
+        boolean resultado = votacion.agregarEstudiante(e);
+        if (!resultado) {
+            JOptionPane.showMessageDialog(
+                this,
+                "-ERROR-",
+                "Verifique Datos o Intente Mas Tarde",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+        
+        JOptionPane.showMessageDialog(
+            this,
+            "Estudiante agregado correctamente",   
+            "Éxito",                               
+            JOptionPane.INFORMATION_MESSAGE        
+        );
+        actualizarTablaEstudiantes();
+        
+    }//GEN-LAST:event_BcargarActionPerformed
 
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Bcargar;
-    private javax.swing.JComboBox<String> CBtribu;
     private javax.swing.JLabel Lapellido;
     private javax.swing.JLabel Ldni;
     private javax.swing.JLabel Ldni4;
@@ -259,9 +321,10 @@ public class Cargar_Estudiante extends javax.swing.JFrame {
     private javax.swing.JPanel Pestudiantes;
     private javax.swing.JToggleButton TBsalir;
     private javax.swing.JTextField TFapellido;
-    private javax.swing.JTextField TFdni;
     private javax.swing.JTextField TFnombre;
+    private javax.swing.JComboBox<String> Tribu;
     private javax.swing.JTable Ttablaestudiantes;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

@@ -33,20 +33,15 @@ public class VotacionesCerradas implements EstadoVotaciones{
     public List<Estructura> contarVotos(String eleccionId, List<ResultadoVoto> votos) {
         List<Estructura> resultados = new ArrayList<>();
 
-        
-        //List<ResultadoVoto> votos = GestorVoto.getInstance().obtenerVotosPorEleccion(eleccionId);// obtenemos los votos del gestor
-
-
-        Map<Estructura, Integer> conteo = new HashMap<>();//agrupar los votos por candidato/lista
+        Map<Estructura, Integer> conteo = new HashMap<>();
 
         for (ResultadoVoto rv : votos) {
-            Estructura candidato = rv.getCandidato(); // o getLista 
+            Estructura candidato = rv.getCandidato();
             int cantidad = rv.getVotos();
-            conteo.put(candidato, conteo.getOrDefault(candidato, 0) + cantidad);// sumamos los votos en el mapa
+            conteo.put(candidato, conteo.getOrDefault(candidato, 0) + cantidad);
         }
 
-        
-        System.out.println("Conteo de votos para elección " + eleccionId + ":"); // mostrar resultados y crear la lista de ResultadoVoto
+        System.out.println("Conteo de votos para elección " + eleccionId + ":");
         for (Map.Entry<Estructura, Integer> entry : conteo.entrySet()) {
             Estructura candidato = entry.getKey();
             int cantidad = entry.getValue();
@@ -54,12 +49,13 @@ public class VotacionesCerradas implements EstadoVotaciones{
             candidato.mostrar();
             System.out.println(" - Votos: " + cantidad);
 
-            ResultadoVoto resultado = new ResultadoVoto(eleccionId,candidato, cantidad);
+            ResultadoVoto resultado = new ResultadoVoto(eleccionId, candidato, candidato.getNombre(), cantidad);
             resultados.add(resultado);
         }
 
         return resultados;
     }
+
     @Override
     public void recibirVoto(IVoto voto){
     
@@ -71,8 +67,8 @@ public class VotacionesCerradas implements EstadoVotaciones{
     }
     
     @Override
-    public ResultadoVoto procesarVoto(String eleccionId, Estructura listaSeleccionada, String dni){
-        return new ResultadoVoto();
+    public String  procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token){
+        return "Votacion Cerrada";
     }
     
     @Override
@@ -84,8 +80,6 @@ public class VotacionesCerradas implements EstadoVotaciones{
         return new Token();
     }
     
-    // CheckearPorListaCompleta();
-    // AnunciarGanadores();
 
    @Override
     public EstadoVotaciones CambiarEstado(EstadoVotaciones estado, Date inicio, Date fin, Date ahora) {
@@ -119,10 +113,10 @@ public class VotacionesCerradas implements EstadoVotaciones{
     }
     
     @Override
-public boolean agregarEstudiante(Estudiante estudiante, List<Estructura> estudiantes) {
+    public boolean agregarEstudiante(Estudiante estudiante, List<Estructura> estudiantes) {
 
-    return false;
-}
+        return false;
+    }
 
     @Override
     public boolean eliminarEstudiante(String dni, List<Estudiante> estudiantes) {
@@ -146,9 +140,30 @@ public boolean agregarEstudiante(Estudiante estudiante, List<Estructura> estudia
         return null; // No se encontró el estudiante
     }
     @Override
-    public void listarEstudiantes(List<Estudiante> estudiantes) {
-        
+    public List<Estructura> listarEstudiantes(List<Estructura> tribus) {
+        List<Estructura> estudiantesListados = new ArrayList<>();
+
+        for (Estructura estructura : tribus) {
+            if (estructura instanceof Tribu tribu) {
+                System.out.println("Tribu: " + tribu.getNombre());
+
+                List<Estructura> hijos = tribu.obtenerHijos();
+                if (hijos.isEmpty()) {
+                    System.out.println("  - Sin estudiantes");
+                } else {
+                    for (Estructura hijo : hijos) {
+                        if (hijo instanceof Estudiante estudiante) {
+                            System.out.println("  - " + estudiante.getNombre() + " (" + estudiante.getDni() + ")");
+                            estudiantesListados.add(estudiante);
+                        }
+                    }
+                }
+            }
+        }
+
+        return estudiantesListados;
     }
+     
 
 
 }

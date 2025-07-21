@@ -11,7 +11,7 @@ public interface EstadoVotaciones {
     List<Estructura> contarVotos(String id, List<ResultadoVoto> votos);
     boolean cargarLista(Estructura lista);
     EstadoVotaciones CambiarEstado(EstadoVotaciones estado, Date inicio, Date fin, Date ahora);
-    ResultadoVoto procesarVoto(String eleccionId, Estructura listaSeleccionada, String dni);
+    String procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token);
     Token generarToken(String eleccionId, String dni) ;
     boolean validarToken(Token token, List<Token> tokens);
     String getNombreVisible();
@@ -20,5 +20,5 @@ public interface EstadoVotaciones {
     boolean agregarEstudiante(Estudiante estudiante, List<Estructura> estudiantes);
     boolean eliminarEstudiante(String dni, List<Estudiante> estudiantes);
     Estudiante buscarEstudiante(String dni, List<Estructura> tribus);
-    void listarEstudiantes(List<Estudiante> estudiantes);
+    List<Estructura> listarEstudiantes(List<Estructura> tribus);
 }

@@ -165,9 +165,8 @@ public class Generar_Token extends javax.swing.JFrame {
     }//GEN-LAST:event_TBgenerarActionPerformed
 
     private void TBsalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TBsalirActionPerformed
-        /*Index index = new Index();
-        index.setVisible(true);*/
-
+        Gestionar_Votacion v = new Gestionar_Votacion(eleccion);
+        v.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_TBsalirActionPerformed
 

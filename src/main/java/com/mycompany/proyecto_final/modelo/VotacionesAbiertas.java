@@ -1,5 +1,6 @@
 package com.mycompany.proyecto_final.modelo;
 
+import com.mycompany.proyecto_final.comando.EmitirVotoCommand;
 import com.mycompany.proyecto_final.comando.VotoService;
 import com.mycompany.proyecto_final.gestores.GestorEleccion;
 import com.mycompany.proyecto_final.gestores.GestorLista;
@@ -7,17 +8,18 @@ import com.mycompany.proyecto_final.gestores.GestorToken;
 import com.mycompany.proyecto_final.gestores.GestorVoto;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class VotacionesAbiertas implements EstadoVotaciones {    
     public static VotacionesAbiertas instance;
     private GestorLista gestor;
-    private RegistradorDeVoto registrador = new RegistradorDeVoto();
+    private RegistradorDeVoto registrador = RegistradorDeVoto.getInstance();
     private VotoService votoService;
      
     private VotacionesAbiertas(){
-    
+        this.votoService = VotoService.getInstance();
     }
     
     public static VotacionesAbiertas getInstance(){
@@ -43,7 +45,7 @@ public class VotacionesAbiertas implements EstadoVotaciones {
     @Override
     public boolean cargarLista(Estructura lista){
         // lógica
-        return true;
+        return false;
     }
     
      @Override
@@ -51,34 +53,66 @@ public class VotacionesAbiertas implements EstadoVotaciones {
         return "Activo";
     }
     
-    @Override 
-    public ResultadoVoto procesarVoto(String eleccionId, Estructura listaSeleccionada, String dni) {
-        GestorEleccion gestorEleccion = GestorEleccion.getInstancia();
-        VotacionContext eleccion = gestorEleccion.obtenerVotacion(eleccionId);
+   @Override
+    public String procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token) {
+        System.out.println("procesarVoto llamado con eleccionId=" + contexto.getId() + ", dni=" + dni + ", listaSeleccionada=" + (listaSeleccionada != null ? listaSeleccionada.getNombre() : "null"));
 
-        if (eleccion == null) {
-            System.out.println("No existe la elección.");
-            return  new ResultadoVoto();
+        Estudiante estudiante = contexto.buscarEstudiante(dni);
+        if (estudiante == null) {
+            return "Estudiante no encontrado";
+        }
+        if (contexto.getVotaron().contains(dni)) {
+            return "Error: el estudiante ya ha votado";
+        }
+        if (!contexto.validarToken(token)) {
+            return "Token inválido";
+        }
+        if (token.isUsado()) {
+            return "Token ya fue utilizado";
         }
 
-        if (!eleccion.esListaValida(listaSeleccionada)) {
-            System.out.println("Lista no válida para esta elección.");
-            return  new ResultadoVoto();
+        IVoto voto;
+        if (listaSeleccionada == null) {
+            System.out.println("Voto en blanco seleccionado");
+            voto = new VotoEnBlanco();
+        } else {
+            System.out.println("Voto lista completa: " + listaSeleccionada.getNombre());
+            voto = new VotoListaCompleta(listaSeleccionada);
         }
 
-        IVoto voto = new VotoListaCompleta(listaSeleccionada);
-        RegistradorDeVoto registrador = new RegistradorDeVoto();
-        return registrador.ejecutarVoto(dni, voto, votoService, listaSeleccionada);
+        EmitirVotoCommand comando = new EmitirVotoCommand(registrador, voto, votoService , dni, listaSeleccionada);
+        System.out.println("Ejecutando comando EmitirVotoCommand...");
+        ResultadoVoto resultado = comando.execute();  // Esto ya llama a registrarVoto internamente
+
+         
+        if (resultado != null) {
+            token.setUsado(true);
+            
+
+            if ("Voto en Blanco".equalsIgnoreCase(resultado.getNombre())) {
+                return "Voto en blanco registrado correctamente.";
+            }
+
+            System.out.println("Voto realizado - Candidato ID: " + resultado.getCandidato().getId() + " - Nombre: " + resultado.getNombre());
+            return "Voto registrado con éxito.";
+        } else {
+            return "Error al registrar el voto.";
+        }
     }
+
+
+
+
     @Override
     public boolean validarToken(Token token, List<Token> tokens) {
+        
         for (Token t : tokens) {
             if (t.getToken().equals(token.getToken()) &&
                 t.getDni().equals(token.getDni()) &&
                 t.getEleccionId().equals(token.getEleccionId()) &&
                 !t.isUsado()) {
-
-                t.setUsado(true); // marcar como usado
+                System.out.println("Token: "+token.getToken()+" DNI: "+token.getDni() + " ID: "+ token.getEleccionId());
+                //t.setUsado(true); // marcar como usado
                 return true;
             }
         }
@@ -87,17 +121,20 @@ public class VotacionesAbiertas implements EstadoVotaciones {
 
     @Override
     public Token generarToken(String eleccionId, String dni) {
+        
         return GestorToken.getInstancia().generarToken(eleccionId, dni);
     }
 
     @Override
     public EstadoVotaciones CambiarEstado(EstadoVotaciones estado, Date inicio, Date fin, Date ahora) {
-        if (ahora.after(fin)) {
+        /*if (ahora.after(fin)) {
             System.out.println("La votación ha finalizado. Cambiando a estado: VotacionesCerradas.");
             return  VotacionesCerradas.getInstance();
         } else {
             return this; 
-        }
+        }*/
+        
+        return  VotacionesCerradas.getInstance();
     }
     @Override
     public Estudiante validarEstudiante(String dni, List<Estudiante> estudiantes) {
@@ -111,20 +148,25 @@ public class VotacionesAbiertas implements EstadoVotaciones {
 
     @Override
     public Estudiante validarEstudianteAvanzado(Estudiante estudiante, List<Estructura> estudiantes) {
+        if (estudiante == null) {
+            System.err.println("Error: se intentó validar un estudiante null.");
+            return null;
+        }
+
         for (Estructura estructura : estudiantes) {
-            // Nos aseguramos de que sea una tribu
             if (estructura instanceof Tribu tribu) {
                 for (Estructura hijo : tribu.obtenerHijos()) {
                     if (hijo instanceof Estudiante est) {
                         if (est.getDni().equals(estudiante.getDni())) {
-                            return est; // Estudiante encontrado
+                            return est;
                         }
                     }
                 }
             }
         }
-        return null; // No se encontró
+        return null;
     }
+
     
     @Override
     public boolean agregarEstudiante(Estudiante estudiante, List<Estructura> estudiantes) {
@@ -153,13 +195,30 @@ public class VotacionesAbiertas implements EstadoVotaciones {
     }
 
     @Override
-    public void listarEstudiantes(List<Estudiante> estudiantes) {
-        if (estudiantes.isEmpty()) {
-            System.out.println("No hay estudiantes cargados.");
-            return;
+    public List<Estructura> listarEstudiantes(List<Estructura> tribus) {
+        List<Estructura> estudiantesListados = new ArrayList<>();
+
+        for (Estructura estructura : tribus) {
+            if (estructura instanceof Tribu tribu) {
+                System.out.println("Tribu: " + tribu.getNombre());
+
+                List<Estructura> hijos = tribu.obtenerHijos();
+                if (hijos.isEmpty()) {
+                    System.out.println("  - Sin estudiantes");
+                } else {
+                    for (Estructura hijo : hijos) {
+                        if (hijo instanceof Estudiante estudiante) {
+                            System.out.println("  - " + estudiante.getNombre() + " (" + estudiante.getDni() + ")");
+                            estudiantesListados.add(estudiante);
+                        }
+                    }
+                }
+            }
         }
-        for (Estudiante e : estudiantes) {
-            System.out.println("- " + e.getNombre() + " (" + e.getDni() + ")");
-        }
+
+        return estudiantesListados;
     }
+    
+   
+
 }

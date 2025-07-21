@@ -4,6 +4,7 @@ import com.mycompany.proyecto_final.controladores.Sistema;
 import com.mycompany.proyecto_final.modelo.EstadoVotaciones;
 import com.mycompany.proyecto_final.modelo.VotacionContext;
 import com.mycompany.proyecto_final.modelo.VotacionesAbiertas;
+import com.mycompany.proyecto_final.modelo.VotacionesCerradas;
 import com.mycompany.proyecto_final.modelo.VotacionesEnPreparacion;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -24,8 +25,12 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
         } else {
             botonAbrir.setVisible(false);
         }
+        if (votacion.getEstado() instanceof VotacionesAbiertas) {
+            botonCerrar.setVisible(true);
+        } else {
+            botonCerrar.setVisible(false);
+        }
     }
-
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -52,6 +57,7 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
         Ldni8 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         botonAbrir = new javax.swing.JButton();
+        botonCerrar = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -262,6 +268,14 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
             }
         });
 
+        botonCerrar.setBackground(new java.awt.Color(255, 0, 0));
+        botonCerrar.setText("Cerrar Votacion");
+        botonCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCerrarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -276,7 +290,9 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
                     .addComponent(Pcargarestudiante4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(Pcargarestudiante, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 123, Short.MAX_VALUE)
-                .addComponent(Pcargarestudiante2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Pcargarestudiante2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonCerrar, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(77, 77, 77))
         );
         jPanel1Layout.setVerticalGroup(
@@ -290,7 +306,8 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(Pcargarestudiante4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botonAbrir, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(botonAbrir, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(botonCerrar, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(32, 32, 32))
         );
 
@@ -369,7 +386,19 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
     }//GEN-LAST:event_BcargarActionPerformed
 
     private void resultadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultadosActionPerformed
-        // TODO add your handling code here:
+        if (votacion.getEstado() instanceof VotacionesAbiertas || votacion.getEstado() instanceof VotacionesEnPreparacion) {
+            
+            JOptionPane.showMessageDialog(
+                null,
+                "La votacion está Abierta, no hay resultados",
+                "Información",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+        Resultados r = new Resultados(votacion);
+        r.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_resultadosActionPerformed
 
     private void botonAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAbrirActionPerformed
@@ -382,11 +411,29 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
 
         JOptionPane.showMessageDialog(
             null,
-            "Error - Intente luego",
+            "Error - Intente abrir la votacion dentro el horario que estableció",
             "Información",
             JOptionPane.INFORMATION_MESSAGE
         );
     }//GEN-LAST:event_botonAbrirActionPerformed
+
+    private void botonCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCerrarActionPerformed
+        // cambiar de Estado
+        votacion.setEstado(VotacionesCerradas.getInstance());
+
+        if (votacion.getEstado() instanceof VotacionesCerradas) {
+            botonAbrir.setVisible(false);
+            JOptionPane.showMessageDialog(
+                null,
+                "Votacion Cerrada",
+                "Información",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+
+        
+    }//GEN-LAST:event_botonCerrarActionPerformed
 
     
 
@@ -404,6 +451,7 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
     private javax.swing.JPanel Pcargarestudiante4;
     private javax.swing.JToggleButton TBsalir;
     private javax.swing.JButton botonAbrir;
+    private javax.swing.JToggleButton botonCerrar;
     private javax.swing.JButton fiscalizar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

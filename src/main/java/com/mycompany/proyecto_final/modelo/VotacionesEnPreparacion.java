@@ -4,8 +4,10 @@ import com.mycompany.proyecto_final.gestores.GestorLista;
 import com.mycompany.proyecto_final.gestores.GestorVoto;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class VotacionesEnPreparacion implements EstadoVotaciones {
     public static VotacionesEnPreparacion instance;
@@ -39,8 +41,27 @@ public class VotacionesEnPreparacion implements EstadoVotaciones {
     }
     
     @Override
-    public boolean cargarLista(Estructura lista){
-        return false;
+    public boolean cargarLista(Estructura lista) {
+        Set<String> dnis = new HashSet<>();
+
+        // Recorremos las tribus que componen la lista
+        for (Estructura tribu : lista.obtenerHijos()) {
+            // Recorremos las delegaciones de la tribu
+            for (Estructura delegacion : tribu.obtenerHijos()) {
+                // Recorremos los estudiantes de la delegacion
+                for (Estructura estudiante : delegacion.obtenerHijos()) {
+                    String dni = estudiante.getId(); // o estudiante.getDni() si puedes castear
+
+                    // Verificamos si el DNI ya está en el conjunto
+                    if (dnis.contains(dni)) {
+                        System.out.println("Error: DNI repetido encontrado: " + dni);
+                        return false; // DNI duplicado, no se puede cargar la lista
+                    }
+                    dnis.add(dni);
+                }
+            }
+        }
+        return true;
     }
    
     @Override
@@ -60,8 +81,8 @@ public class VotacionesEnPreparacion implements EstadoVotaciones {
     }
     
     @Override 
-    public ResultadoVoto procesarVoto(String eleccionId, Estructura listaSeleccionada, String dni){
-        return new ResultadoVoto();
+    public String procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token){
+        return "Votacion En preparacion";
     }
     @Override
     public boolean validarToken(Token token, List<Token> tokens) {
@@ -78,7 +99,12 @@ public class VotacionesEnPreparacion implements EstadoVotaciones {
     
     
     @Override
-    public Estudiante validarEstudianteAvanzado(Estudiante estudiante, List<Estructura> estudiantes) {
+    public Estudiante validarEstudianteAvanzado(Estudiante estudiante, List<Estructura> estudiantes) { // buscamos que un estudiante pertenezca a la tribu que dice pertenecer
+        if (estudiante == null) {
+            System.out.println("Error: el parámetro 'estudiante' es null");
+            return null;
+        }
+
         for (Estructura estructura : estudiantes) {
             // Nos aseguramos de que sea una tribu
             if (estructura instanceof Tribu tribu) {
@@ -144,14 +170,29 @@ public class VotacionesEnPreparacion implements EstadoVotaciones {
 
 
     @Override
-    public void listarEstudiantes(List<Estudiante> estudiantes) {
-        if (estudiantes.isEmpty()) {
-            System.out.println("No hay estudiantes cargados.");
-            return;
+    public List<Estructura> listarEstudiantes(List<Estructura> tribus) {
+        List<Estructura> estudiantesListados = new ArrayList<>();
+
+        for (Estructura estructura : tribus) {
+            if (estructura instanceof Tribu tribu) {
+                System.out.println("Tribu: " + tribu.getNombre());
+
+                List<Estructura> hijos = tribu.obtenerHijos();
+                if (hijos.isEmpty()) {
+                    System.out.println("  - Sin estudiantes");
+                } else {
+                    for (Estructura hijo : hijos) {
+                        if (hijo instanceof Estudiante estudiante) {
+                            System.out.println("  - " + estudiante.getNombre() + " (" + estudiante.getDni() + ")");
+                            estudiantesListados.add(estudiante);
+                        }
+                    }
+                }
+            }
         }
-        for (Estudiante e : estudiantes) {
-            System.out.println("- " + e.getNombre() + " (" + e.getDni() + ")");
-        }
+
+        return estudiantesListados;
     }
+
 
 }

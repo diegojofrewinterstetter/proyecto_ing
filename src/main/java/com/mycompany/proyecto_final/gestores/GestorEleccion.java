@@ -86,10 +86,12 @@ public class GestorEleccion {
         VotacionContext votacion1 = new VotacionContext("V001", "Elección Pasos", "2025-08-01 08:00:00", "2025-08-01 18:05:00");
         VotacionContext votacion2 = new VotacionContext("V002", "Eleccion General", "2025-08-10 08:00:00", "2025-08-10 18:05:00");
         VotacionContext votacion3 = new VotacionContext("V003", "Elección Valotage", "2025-08-20 08:00:00", "2025-08-20 18:05:00");
+        VotacionContext votacionEjemplo = new VotacionContext("V100", "Elección de Prueba", java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), java.time.LocalDateTime.now().plusHours(10).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
 
         agregarVotacion(votacion1);
         agregarVotacion(votacion2);
         agregarVotacion(votacion3);
+        agregarVotacion(votacionEjemplo);
     }
 }
