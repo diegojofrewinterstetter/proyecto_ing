@@ -1,4 +1,5 @@
 package com.mycompany.proyecto_final.modelo;
+import com.mycompany.proyecto_final.comando.VotoService;
 import com.mycompany.proyecto_final.gestores.GestorLista;
 import com.mycompany.proyecto_final.gestores.GestorVoto;
 import com.mycompany.proyecto_final.modelo.Estructura;
@@ -28,33 +29,14 @@ public class VotacionesCerradas implements EstadoVotaciones{
      @Override
     public String getNombreVisible() {
         return "Finalizada";
+        
     }
+    
     @Override
-    public List<Estructura> contarVotos(String eleccionId, List<ResultadoVoto> votos) {
-        List<Estructura> resultados = new ArrayList<>();
-
-        Map<Estructura, Integer> conteo = new HashMap<>();
-
-        for (ResultadoVoto rv : votos) {
-            Estructura candidato = rv.getCandidato();
-            int cantidad = rv.getVotos();
-            conteo.put(candidato, conteo.getOrDefault(candidato, 0) + cantidad);
-        }
-
-        System.out.println("Conteo de votos para elección " + eleccionId + ":");
-        for (Map.Entry<Estructura, Integer> entry : conteo.entrySet()) {
-            Estructura candidato = entry.getKey();
-            int cantidad = entry.getValue();
-
-            candidato.mostrar();
-            System.out.println(" - Votos: " + cantidad);
-
-            ResultadoVoto resultado = new ResultadoVoto(eleccionId, candidato, candidato.getNombre(), cantidad);
-            resultados.add(resultado);
-        }
-
-        return resultados;
+    public Map<String, Integer> contarVotos(VotacionContext contexto) {
+        return contexto.getConteoVotos();
     }
+
 
     @Override
     public void recibirVoto(IVoto voto){
@@ -67,7 +49,7 @@ public class VotacionesCerradas implements EstadoVotaciones{
     }
     
     @Override
-    public String  procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token){
+    public String  procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token, RegistradorDeVoto registrador, VotoService votoService){
         return "Votacion Cerrada";
     }
     

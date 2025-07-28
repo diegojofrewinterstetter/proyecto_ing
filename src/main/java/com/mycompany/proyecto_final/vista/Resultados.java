@@ -1,13 +1,12 @@
 package com.mycompany.proyecto_final.vista;
 
-import com.mycompany.proyecto_final.modelo.ResultadoVoto;
+import com.mycompany.proyecto_final.modelo.Estudiante;
 import com.mycompany.proyecto_final.modelo.VotacionContext;
 import com.mycompany.proyecto_final.modelo.VotacionesCerradas;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class Resultados extends JFrame {
 
@@ -16,11 +15,10 @@ public class Resultados extends JFrame {
     public Resultados(VotacionContext votacion) {
         this.votacion = votacion;
         setTitle("Resultados de la Votación");
-        setSize(500, 400);
+        setSize(550, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Verificamos el estado
         if (!(votacion.getEstado() instanceof VotacionesCerradas)) {
             JOptionPane.showMessageDialog(
                 this,
@@ -33,48 +31,39 @@ public class Resultados extends JFrame {
         }
 
         initUI();
-
-        // Mostrar la ventana
         setVisible(true);
     }
 
     private void initUI() {
-        // Contamos y agrupamos los votos
-        List<ResultadoVoto> votosIndividuales = votacion.contarVotos(votacion.getId())
-                .stream()
-                .filter(e -> e instanceof ResultadoVoto)
-                .map(e -> (ResultadoVoto) e)
-                .collect(Collectors.toList());
+        JPanel panel = new JPanel(new BorderLayout());
+        JTextArea textArea = new JTextArea();
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        textArea.setEditable(false);
 
-        List<ResultadoVoto> resultadosAgrupados = votacion.agruparResultados(votosIndividuales);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Conteo detallado de votos por postulante:\n\n");
 
-        // Si no hay resultados, mostramos mensaje y volvemos al menú
-        if (resultadosAgrupados.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                this,
-                "No hay votos para mostrar.",
-                "Sin resultados",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-            this.dispose();
-            Gestionar_Votacion gv = new Gestionar_Votacion(votacion);
-            gv.setVisible(true);
-            return;
+        Map<String, Integer> conteoVotos = votacion.contarVotos();
+
+        if (conteoVotos == null || conteoVotos.isEmpty()) {
+            sb.append("No hay votos para mostrar.");
+        } else {
+            for (Map.Entry<String, Integer> entry : conteoVotos.entrySet()) {
+                String dni = entry.getKey();
+                int votos = entry.getValue();
+
+                Estudiante estudiante = votacion.buscarEstudiante(dni);
+                String nombre = (estudiante != null) ? estudiante.getNombre() : "Desconocido";
+
+                // Formateamos para que quede alineado
+                sb.append(String.format("%-25s (DNI: %-10s) - Votos: %d%n", nombre, dni, votos));
+            }
         }
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        textArea.setText(sb.toString());
+        JScrollPane scrollPane = new JScrollPane(textArea);
 
-        for (ResultadoVoto resultado : resultadosAgrupados) {
-            String nombre = resultado.getNombre();
-            int cantidad = resultado.getVotos();
-            JLabel label = new JLabel(nombre + " - Votos: " + cantidad);
-            label.setFont(new Font("Arial", Font.PLAIN, 16));
-            label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-            panel.add(label);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(panel);
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        getContentPane().add(panel);
     }
 }

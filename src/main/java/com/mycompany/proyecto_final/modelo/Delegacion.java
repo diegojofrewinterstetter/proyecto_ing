@@ -7,11 +7,11 @@ public class Delegacion implements Estructura {
 
     private String id;
     private String nombre;
-    private List<Estructura> estudiantes = new ArrayList<>();
+    private List<Estudiante> estudiantes = new ArrayList<>(); // estudiante Asignado
 
     public Delegacion(String id, String nombre) {
         this.id = id;
-        this.nombre = nombre;
+        this.nombre = nombre; // nombre del cargo
     }
     
     public Delegacion(String id, String nombre, Estudiante estudiante) {
@@ -19,6 +19,23 @@ public class Delegacion implements Estructura {
         this.nombre = nombre;
         this.estudiantes.add(estudiante);
     }
+    
+    private String buscarNombreListaDesdeCandidato(Estructura candidato) {
+        // Lógica para encontrar la lista a la que pertenece el candidato
+        // Podés guardar una referencia a la lista en el candidato, o recorrer las listas válidas
+        if (candidato instanceof Delegacion delegacion) {
+            return delegacion.getNombre(); // suponer que la delegación sabe su lista
+        }
+        return "Lista Desconocida";
+    }
+
+    private String buscarNombreTribuDesdeCandidato(Estructura candidato) {
+        if (candidato instanceof Delegacion delegacion) {
+            return delegacion.getNombre(); // suponiendo que lo tenga
+        }
+        return "Tribu Desconocida";
+    }
+
 
     @Override
     public void agregar(Estructura e) {

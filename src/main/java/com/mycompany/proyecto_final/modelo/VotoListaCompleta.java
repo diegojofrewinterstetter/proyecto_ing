@@ -1,15 +1,24 @@
 package com.mycompany.proyecto_final.modelo;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class VotoListaCompleta implements IVoto {
-    private Estructura lista;
-
-    public VotoListaCompleta(Estructura lista) {
-        this.lista = lista;
-    }
 
     @Override
     public ResultadoVoto votar(Estructura estructura, String dni) {
-        return new ResultadoVoto(estructura.getId(), estructura, estructura.getNombre(), 1);
+        List<Delegacion> delegaciones = new ArrayList<>();
+
+        if (estructura instanceof Lista lista) {
+            for (Estructura tribu : lista.obtenerHijos()) {
+                for (Estructura e : tribu.obtenerHijos()) {
+                    if (e instanceof Delegacion d) {
+                        delegaciones.add(d);
+                    }
+                }
+            }
+        }
+
+        return new ResultadoVoto(estructura.getId(), 1, "Voto Lista Completa", delegaciones);
     }
 }

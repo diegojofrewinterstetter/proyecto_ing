@@ -30,13 +30,13 @@ public final class VotacionContext {
     private EstadoVotaciones estadoActual;
     private List<Estudiante> estudiantes;
     private List<Token> tokens;
-    private List<ResultadoVoto> votos;
+    public List<ResultadoVoto> votos;
     private List<Estructura> listasValidas;
     private List<Estructura> tribus;
-    private Set<String> Votaron = new HashSet<>();
-    
+    public Set<String> Votaron = new HashSet<>();
+    private Map<String, Integer> conteoVotos = new HashMap<>();
     private RegistradorDeVoto registrador = RegistradorDeVoto.getInstance();
-    private static VotacionesEnPreparacion instancia = VotacionesEnPreparacion.getInstance();
+    private static VotacionesEnPreparacion instancia = VotacionesEnPreparacion.getInstance(); // para cuando la creamos
 
     public VotacionContext() {
     }
@@ -131,7 +131,6 @@ public final class VotacionContext {
         Tribu tribuH = new Tribu("1", "Huarpe");
         Tribu tribuP = new Tribu("2", "Pehuelche");
 
-        // Definir estructura: nombre del cargo, tribu, índice del estudiante
         String[][] cargos = {
             // Caciques
             {"Cacique Huarpe", "Huarpe", "0"},
@@ -211,7 +210,10 @@ public final class VotacionContext {
             System.out.println("No se pudo cargar la lista de prueba.");
         }
     }
-
+    
+     public Map<String, Integer> getConteoVotos() {
+        return conteoVotos;
+    }
 
 
     public EstadoVotaciones setEstado(EstadoVotaciones nuevoEstado) {
@@ -235,6 +237,18 @@ public final class VotacionContext {
         return estadoActual;
     }
     
+     public void registrarVotoResultado(ResultadoVoto resultado) {
+        if (resultado == null || resultado.getDelegaciones() == null) return;
+        for (Delegacion delegacion : resultado.getDelegaciones()) {
+            String dniPostulante = delegacion.getId();
+            conteoVotos.put(dniPostulante, conteoVotos.getOrDefault(dniPostulante, 0) + 1);
+        }
+       // votos.add(resultado); Lo agregamos en VotacionesAbiertas por ende lo comentamos por si el algun futuro lo llegamos a necesitar... 
+    }
+
+    
+
+    
     public Estudiante validarEstudiante(String dni){
         Estudiante e = buscarEstudiante(dni);
         return this.estadoActual.validarEstudianteAvanzado(e, tribus);
@@ -243,8 +257,9 @@ public final class VotacionContext {
     public Estudiante validarEstudianteAvanzado(Estudiante estudiante){
         return this.estadoActual.validarEstudianteAvanzado(estudiante, tribus);
     }
-    public List<Estructura> contarVotos(String id) {
-        return estadoActual.contarVotos(id, votos);
+    
+    public Map<String, Integer> contarVotos() {
+        return estadoActual.contarVotos(this);
     }
 
     public boolean cargarLista(Estructura lista) {
@@ -257,6 +272,9 @@ public final class VotacionContext {
             System.out.println("No se puede Cargar Lista");
             return false;
         }
+    }
+    public void mostrarResultados() {
+        estadoActual.contarVotos(this);
     }
 
     public List<Estructura> getListasValidas() {
@@ -293,14 +311,18 @@ public final class VotacionContext {
         return false;
     }
 
-  public String procesarVoto(Estructura listaSeleccionada, String dni, Token token) {
-    return estadoActual.procesarVoto(this, listaSeleccionada, dni, token);
-}
+    public String procesarVoto(Estructura listaSeleccionada, String dni, Token token) {
+        return estadoActual.procesarVoto(this, listaSeleccionada, dni, token, registrador, votoService);
+    }
 
-
-
-
-
+    public void mostrarConteoDetalladoConNombres() {
+        System.out.println("Conteo detallado de votos por postulante:");
+        for (Map.Entry<String, Integer> entry : conteoVotos.entrySet()) {
+            Estudiante e = buscarEstudiante(entry.getKey());
+            String nombre = (e != null) ? e.getNombre() : "Desconocido";
+            System.out.println(nombre + " (DNI: " + entry.getKey() + ") - Votos: " + entry.getValue());
+        }
+    } 
     public Token generarToken(String dni) {
         Estudiante e = buscarEstudiante(dni);
         
@@ -337,13 +359,44 @@ public final class VotacionContext {
         Map<String, ResultadoVoto> acumulador = new HashMap<>();
 
         for (ResultadoVoto voto : votos) {
-            String nombre = voto.getNombre();
-            acumulador.putIfAbsent(nombre, new ResultadoVoto(voto.getEleccionId(), voto.getCandidato(), 0));
-            acumulador.get(nombre).votos += voto.getVotos(); 
+            // Crear clave única por estrategia y delegaciones
+            String clave = generarClaveUnica(voto);
+
+            // Si no existe en el acumulador, se agrega una copia base
+            if (!acumulador.containsKey(clave)) {
+                ResultadoVoto nuevo = new ResultadoVoto(
+                    voto.getEleccionId(),
+                    0,
+                    voto.getNombreEstrategia(),
+                    voto.getDelegaciones()
+                );
+                acumulador.put(clave, nuevo);
+            }
+
+            // Sumar votos
+            ResultadoVoto acumulado = acumulador.get(clave);
+            acumulado.setVotos(acumulado.getVotos() + voto.getVotos());
         }
 
         return new ArrayList<>(acumulador.values());
     }
+
+    private String generarClaveUnica(ResultadoVoto voto) {
+        StringBuilder clave = new StringBuilder();
+        clave.append(voto.getEleccionId()).append("|")
+             .append(voto.getNombreEstrategia()).append("|");
+
+        // Hash simple de nombres de delegaciones (ordenadas)
+        List<String> nombres = new ArrayList<>();
+        for (Delegacion d : voto.getDelegaciones()) {
+            nombres.add(d.getNombre());
+        }
+        nombres.sort(String::compareTo); // Orden alfabético para que el orden no afecte la clave
+
+        clave.append(String.join(",", nombres));
+        return clave.toString();
+    }
+
     public String obtenerResumenVotos() {
         if (votos == null || votos.isEmpty()) {
             return "No hay votos registrados.";
@@ -354,7 +407,7 @@ public final class VotacionContext {
         StringBuilder sb = new StringBuilder();
         sb.append("Resultados de la elección ").append(id).append(":\n");
         for (ResultadoVoto resultado : resultadosAgrupados) {
-            sb.append("- ").append(resultado.getNombre())
+            sb.append("- ").append(resultado.getNombreEstrategia())
               .append(": ").append(resultado.getVotos())
               .append(" votos\n");
         }
@@ -363,4 +416,6 @@ public final class VotacionContext {
      public Set<String> getVotaron() {
         return Votaron;
     }
+
+   
 }

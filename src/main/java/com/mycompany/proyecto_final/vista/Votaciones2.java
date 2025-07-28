@@ -21,7 +21,7 @@ public class Votaciones2 extends JFrame {
     private String token;
     private String dni;
     private Token tokenObjeto;
-    private JButton btnVotar; // 👉 Declaración del botón como variable de instancia
+    private JButton btnVotar;
 
     public Votaciones2(VotacionContext votacion, String tribuVotante, String dnistr, String tokenstr, String eleccionIdstr) {
         this.votacion = votacion;
@@ -102,18 +102,16 @@ public class Votaciones2 extends JFrame {
                                                            boolean isSelected, boolean hasFocus,
                                                            int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
                 if (row == 0) {
                     c.setBackground(new Color(255, 250, 205));
                     c.setFont(c.getFont().deriveFont(Font.BOLD));
                 } else {
                     String cargo = (String) table.getValueAt(row, 0);
                     Estructura seleccionada = votos.get(cargo);
-
                     if (column > 0) {
                         String nombreColumna = listas.get(column - 1).getNombre();
                         if (seleccionada != null && seleccionada.getNombre().equals(nombreColumna)) {
-                            c.setBackground(new Color(135, 206, 250)); // celeste
+                            c.setBackground(new Color(135, 206, 250));
                             c.setFont(c.getFont().deriveFont(Font.BOLD));
                         } else {
                             c.setBackground(Color.WHITE);
@@ -124,7 +122,6 @@ public class Votaciones2 extends JFrame {
                         c.setFont(c.getFont().deriveFont(Font.PLAIN));
                     }
                 }
-
                 return c;
             }
         });
@@ -154,7 +151,7 @@ public class Votaciones2 extends JFrame {
             }
         });
 
-        btnVotar = new JButton("VOTAR"); // 👉 Usamos la variable de instancia
+        btnVotar = new JButton("VOTAR");
         btnVotar.setBackground(new Color(34, 139, 34));
         btnVotar.setForeground(Color.WHITE);
         btnVotar.setFont(new Font("Arial", Font.BOLD, 14));
@@ -172,7 +169,6 @@ public class Votaciones2 extends JFrame {
     }
 
     private void realizarVotacion() {
-        // 🔒 Desactiva el botón apenas se hace clic
         btnVotar.setEnabled(false);
 
         if (votacion.getVotaron().contains(dni)) {
@@ -181,7 +177,6 @@ public class Votaciones2 extends JFrame {
         }
 
         if (votos == null || votos.isEmpty()) {
-            // Voto en blanco
             String mensaje = votacion.procesarVoto(null, dni, tokenObjeto);
             JOptionPane.showMessageDialog(this, mensaje);
             votacion.getVotaron().add(dni);
@@ -189,16 +184,37 @@ public class Votaciones2 extends JFrame {
             return;
         }
 
-        for (Map.Entry<String, Estructura> entry : votos.entrySet()) {
-            Estructura lista = entry.getValue();
-            votacion.procesarVoto(lista, dni, tokenObjeto);
-        }
+        // Tomar cualquier valor del mapa (todas las elecciones son de la misma lista)
+        Estructura listaSeleccionada = votos.values().iterator().next();
+        Estructura listaReducida = construirEstructuraReducida(listaSeleccionada);
 
-        JOptionPane.showMessageDialog(this, "Voto registrado correctamente.");
+        String mensaje = votacion.procesarVoto(listaReducida, dni, tokenObjeto);
+        JOptionPane.showMessageDialog(this, mensaje);
         votacion.getVotaron().add(dni);
-        
-        Index index= new Index(votacion);
+
+        Index index = new Index(votacion);
         index.setVisible(true);
         dispose();
+    }
+
+    private Estructura construirEstructuraReducida(Estructura listaOriginal) {
+        if (!(listaOriginal instanceof Lista original)) return listaOriginal;
+
+        Lista nuevaLista = new Lista(original.getId(), original.getNombre());
+
+        for (Estructura t : original.obtenerHijos()) {
+            if (t instanceof Tribu tribu && tribu.getNombre().equals(tribuVotante)) {
+                Tribu nuevaTribu = new Tribu(tribu.getId(), tribu.getNombre());
+                for (Estructura d : tribu.obtenerHijos()) {
+                    if (d instanceof Delegacion delegacion) {
+                        nuevaTribu.agregar(delegacion);
+                    }
+                }
+                nuevaLista.agregar(nuevaTribu);
+                break;
+            }
+        }
+
+        return nuevaLista;
     }
 }

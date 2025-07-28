@@ -15,11 +15,11 @@ import java.util.Map;
 public class VotacionesAbiertas implements EstadoVotaciones {    
     public static VotacionesAbiertas instance;
     private GestorLista gestor;
-    private RegistradorDeVoto registrador = RegistradorDeVoto.getInstance();
-    private VotoService votoService;
+    //private RegistradorDeVoto registrador = RegistradorDeVoto.getInstance();
+    //private VotoService votoService;
      
     private VotacionesAbiertas(){
-        this.votoService = VotoService.getInstance();
+       // this.votoService = VotoService.getInstance();
     }
     
     public static VotacionesAbiertas getInstance(){
@@ -29,13 +29,14 @@ public class VotacionesAbiertas implements EstadoVotaciones {
         return instance;
     }
     
-  
+    
     @Override
-    public List<Estructura> contarVotos(String id, List<ResultadoVoto> votos) {
-        List<Estructura> lista = new ArrayList<>();
-        System.out.println("No Se pueden contar Votos mientra la votacion se encuentra Abierta:");
-        return lista;
+    public Map<String, Integer> contarVotos(VotacionContext contexto) {
+        System.out.println("⚠ No se pueden contar votos mientras la votación está abierta.");
+        return new HashMap<>(); // Devolvemos un mapa vacío
     }
+    
+    
     @Override
     public void recibirVoto(IVoto voto){}
     
@@ -53,52 +54,57 @@ public class VotacionesAbiertas implements EstadoVotaciones {
         return "Activo";
     }
     
-   @Override
-    public String procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token) {
-        System.out.println("procesarVoto llamado con eleccionId=" + contexto.getId() + ", dni=" + dni + ", listaSeleccionada=" + (listaSeleccionada != null ? listaSeleccionada.getNombre() : "null"));
+    @Override
+      public String procesarVoto(VotacionContext contexto, Estructura listaSeleccionada, String dni, Token token, RegistradorDeVoto registrador, VotoService votoService) {
+          System.out.println("procesarVoto llamado con eleccionId=" + contexto.getId() + ", dni=" + dni + ", listaSeleccionada=" + (listaSeleccionada != null ? listaSeleccionada.getNombre() : "null"));
 
-        Estudiante estudiante = contexto.buscarEstudiante(dni);
-        if (estudiante == null) {
-            return "Estudiante no encontrado";
-        }
-        if (contexto.getVotaron().contains(dni)) {
-            return "Error: el estudiante ya ha votado";
-        }
-        if (!contexto.validarToken(token)) {
-            return "Token inválido";
-        }
-        if (token.isUsado()) {
-            return "Token ya fue utilizado";
-        }
+          Estudiante estudiante = contexto.buscarEstudiante(dni);
+          if (estudiante == null) {
+              return "Estudiante no encontrado";
+          }
+          if (contexto.getVotaron().contains(dni)) {
+              return "Error: el estudiante ya ha votado";
+          }
+          if (!contexto.validarToken(token)) {
+              return "Token inválido";
+          }
+          if (token.isUsado()) {
+              return "Token ya fue utilizado";
+          }
 
-        IVoto voto;
-        if (listaSeleccionada == null) {
-            System.out.println("Voto en blanco seleccionado");
-            voto = new VotoEnBlanco();
-        } else {
-            System.out.println("Voto lista completa: " + listaSeleccionada.getNombre());
-            voto = new VotoListaCompleta(listaSeleccionada);
-        }
+          IVoto voto;
+          if (listaSeleccionada == null) {
+              System.out.println("Voto en blanco seleccionado");
+              voto = new VotoEnBlanco();
+          } else {
+              System.out.println("Voto lista completa o seleccionada");
+              voto = new VotoListaCompleta();
+          }
 
-        EmitirVotoCommand comando = new EmitirVotoCommand(registrador, voto, votoService , dni, listaSeleccionada);
-        System.out.println("Ejecutando comando EmitirVotoCommand...");
-        ResultadoVoto resultado = comando.execute();  // Esto ya llama a registrarVoto internamente
+          EmitirVotoCommand comando = new EmitirVotoCommand(registrador, voto, votoService, dni, listaSeleccionada);
+          System.out.println("Ejecutando comando EmitirVotoCommand...");
+          ResultadoVoto resultado = comando.execute();  // Esto ya llama a registrarVoto internamente
 
-         
-        if (resultado != null) {
+          if (resultado != null) {
             token.setUsado(true);
-            
 
-            if ("Voto en Blanco".equalsIgnoreCase(resultado.getNombre())) {
+            if ("Voto en Blanco".equalsIgnoreCase(resultado.getNombreEstrategia())) {
                 return "Voto en blanco registrado correctamente.";
             }
 
-            System.out.println("Voto realizado - Candidato ID: " + resultado.getCandidato().getId() + " - Nombre: " + resultado.getNombre());
+            System.out.println("Voto realizado - Nombre: " + resultado.getNombreEstrategia());
+            System.out.println("Votos antes: " + contexto.votos.size());
+            contexto.votos.add(resultado);
+            System.out.println("Votos después: " + contexto.votos.size());
+
+            contexto.registrarVotoResultado(resultado);  // REGISTRA votos detallados por DNI
+            contexto.Votaron.add(dni);
+
             return "Voto registrado con éxito.";
         } else {
-            return "Error al registrar el voto.";
-        }
-    }
+              return "Error al registrar el voto.";
+          }
+      }
 
 
 

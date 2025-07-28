@@ -2,141 +2,71 @@ package com.mycompany.proyecto_final.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
-/*
-public class ResultadoVoto implements Estructura {
-    protected Estructura candidato;
-    private String eleccionId;
-    protected int votos;
-    protected List<ResultadoVoto> subResultados = new ArrayList<>();
 
-    public ResultadoVoto(String eleccionId, Estructura candidato, int votos) {
+public class ResultadoVoto {
+
+    private String eleccionId;
+    private int votos;
+    private String nombreEstrategia; // Ej: "Voto Lista Completa", "Voto en Blanco", etc.
+    private List<Delegacion> delegaciones = new ArrayList<>();
+
+    public ResultadoVoto(String eleccionId, int votos, String nombreEstrategia, List<Delegacion> delegaciones) {
         this.eleccionId = eleccionId;
-        this.candidato = candidato;
         this.votos = votos;
+        this.nombreEstrategia = nombreEstrategia;
+        this.delegaciones = delegaciones != null ? delegaciones : new ArrayList<>();
     }
-    public ResultadoVoto(){}
+
+    public ResultadoVoto() {
+        this.delegaciones = new ArrayList<>();
+    }
 
     public String getEleccionId() {
         return eleccionId;
     }
 
-    public Estructura getCandidato() {
-        return candidato;
+    public void setEleccionId(String eleccionId) {
+        this.eleccionId = eleccionId;
     }
 
     public int getVotos() {
         return votos;
     }
 
-    public void agregarSubResultado(ResultadoVoto resultado) {
-        subResultados.add(resultado);
-    }
-
-    @Override
-    public Estructura mostrar() {
-        if (candidato != null) {
-            System.out.println("Candidato: " + candidato.getNombre() + " - Votos: " + votos);
-        }
-        for (ResultadoVoto sub : subResultados) {
-            sub.mostrar();
-        }
-        return this;
-    }
-
-    @Override
-    public String getId() {
-        return this.eleccionId;
-    }
-
-    @Override
-    public String getNombre() {
-        return candidato != null ? candidato.getNombre() : "Voto en Blanco";
-    }
-
-    @Override
-    public List<Estructura> obtenerHijos() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    @Override
-    public void agregar(Estructura e) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void eliminar(Estructura e) {
-       throw new UnsupportedOperationException("Not supported yet.");
-    }
-}
-*/public class ResultadoVoto implements Estructura {
-    protected Estructura candidato;
-    private String eleccionId;
-    protected int votos;
-    protected String nombre; // ← NUEVO
-    protected List<ResultadoVoto> subResultados = new ArrayList<>();
-
-    public ResultadoVoto(String eleccionId, Estructura candidato, String nombre, int votos) {
-        this.eleccionId = eleccionId;
-        this.candidato = candidato;
-        this.votos = votos;
-        this.nombre = nombre;
-    }
-    
-    public ResultadoVoto(String eleccionId, Estructura candidato, int votos) {
-        this.eleccionId = eleccionId;
-        this.candidato = candidato;
+    public void setVotos(int votos) {
         this.votos = votos;
     }
 
-    public ResultadoVoto(){}
-
-    public String getEleccionId() {
-        return eleccionId;
+    public String getNombreEstrategia() {
+        return nombreEstrategia;
     }
 
-    public Estructura getCandidato() {
-        return candidato;
+    public void setNombreEstrategia(String nombreEstrategia) {
+        this.nombreEstrategia = nombreEstrategia;
     }
 
-    public int getVotos() {
-        return votos;
+    public List<Delegacion> getDelegaciones() {
+        return delegaciones;
     }
 
-    public String getNombre() {
-        return nombre != null ? nombre :
-               (candidato != null ? candidato.getNombre() : "Voto en Blanco");
+    public void setDelegaciones(List<Delegacion> delegaciones) {
+        this.delegaciones = delegaciones != null ? delegaciones : new ArrayList<>();
     }
 
-    public void agregarSubResultado(ResultadoVoto resultado) {
-        subResultados.add(resultado);
-    }
-
-    @Override
-    public Estructura mostrar() {
-        System.out.println("Candidato: " + getNombre() + " - Votos: " + votos);
-        for (ResultadoVoto sub : subResultados) {
-            sub.mostrar();
+    public void agregarDelegacion(Delegacion delegacion) {
+        if (delegacion != null) {
+            this.delegaciones.add(delegacion);
         }
-        return this;
     }
 
-    @Override
-    public String getId() {
-        return this.eleccionId;
-    }
-
-    @Override
-    public List<Estructura> obtenerHijos() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void agregar(Estructura e) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void eliminar(Estructura e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void mostrarResumen() {
+        System.out.println("ResultadoVoto:");
+        System.out.println("- Elección ID: " + eleccionId);
+        System.out.println("- Votos: " + votos);
+        System.out.println("- Estrategia: " + nombreEstrategia);
+        System.out.println("- Delegaciones:");
+        for (Delegacion d : delegaciones) {
+            System.out.println("  · " + d.getNombre());
+        }
     }
 }

@@ -429,6 +429,7 @@ public class Gestionar_Votacion extends javax.swing.JFrame {
                 "Información",
                 JOptionPane.INFORMATION_MESSAGE
             );
+            votacion.contarVotos();
             return;
         }
 
